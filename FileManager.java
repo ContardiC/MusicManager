@@ -8,20 +8,20 @@ public class FileManager extends RandomAccessFile {
      public FileManager(String fileName, String mode) throws IOException {
         super(fileName, mode);
     }
-    public boolean writeString(String str, int maxLenght){
-        if(str.length()==maxLenght){
-            try {
-                writeChars(str);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+    public void writeString(String str, int maxLenght){
+        if(str==null){
+            throw new StringValidationException("String cannot be null");
+        }
+        if(str.length()>maxLenght){
+            throw new StringValidationException("String lenght exceeds maximum allowed");
+        }
+        try{
+            writeChars(str);
+            for(int i=str.length();i<maxLenght;i++){
+                writeChar('\0');
             }
+        }catch(IOException e){
+            e.printStackTrace();
         }
-        if(str.length()<maxLenght){
-            
-        }
-        return true;
     }
-    
-    
 }
