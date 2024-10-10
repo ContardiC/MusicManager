@@ -6,7 +6,7 @@ public class Album{
     private Date releaseDate;
     private String genre;
     private int trackCount;
-    private int totalDuration; // in minutes
+    private int totalDuration;   // in minutes
     private String recordLabel;
     // Constructor
     public Album(String title, String artist, Date releaseDate, String genre, int trackCount, int totalDuration, String recordLabel) {
@@ -74,5 +74,5 @@ public class Album{
 
     public void setRecordLabel(String recordLabel) {
         this.recordLabel = recordLabel;
-
+    }
 }
