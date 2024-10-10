@@ -1,27 +1,57 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.File;
+import java.io.IOException;
+import java.io.FileNotFoundException;
 
-public class FileManager extends RandomAccessFile {
-    // Constructor
-     public FileManager(String fileName, String mode) throws IOException {
-        super(fileName, mode);
+public class FileManager {
+    File file;
+    private final int STR_MAX_LENGHT = 10;
+
+    FileManager(File file) {
+        this.file = file;
     }
-    public void writeString(String str, int maxLenght){
-        if(str==null){
-            throw new StringValidationException("String cannot be null");
+
+    public long numberOfRecords(long recordSize) {
+        long lenght = 0;
+        long res = 0;
+        try {
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+            lenght = randomAccessFile.length();
+            randomAccessFile.close();
+            res = lenght / recordSize;
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
+
         }
-        if(str.length()>maxLenght){
-            throw new StringValidationException("String lenght exceeds maximum allowed");
-        }
-        try{
-            writeChars(str);
-            for(int i=str.length();i<maxLenght;i++){
-                writeChar('\0');
+        return res;
+    }
+
+    public void writeString(String str) {
+        try {
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+            if (str == null) {
+                new StringValidationException("String cannot be null");
             }
-        }catch(IOException e){
+            if (str.length() > STR_MAX_LENGHT) {
+                new StringValidationException("String length exceeds maximum allowed");
+            }
+            try {
+                randomAccessFile.writeChars(str);
+                for (int i = str.length(); i < STR_MAX_LENGHT; i++) {
+                    randomAccessFile.writeChar('\0');
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                new RuntimeException("Error writing to file", e);
+            }
+            randomAccessFile.close();
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
+    
 }
