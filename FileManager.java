@@ -5,20 +5,20 @@ import java.io.FileNotFoundException;
 
 public class FileManager {
     File file;
-    private final int STR_MAX_LENGHT = 10;
-
+    private final int STR_MAX_LENGHT = 60;
+    private final long RECORD_SIZE = 
     FileManager(File file) {
         this.file = file;
     }
 
-    public long numberOfRecords(long recordSize) {
+    public long numberOfRecords() {
         long lenght = 0;
         long res = 0;
         try {
             RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
             lenght = randomAccessFile.length();
             randomAccessFile.close();
-            res = lenght / recordSize;
+            res = lenght / RECORD_SIZE;
         } catch (FileNotFoundException e) {
 
         } catch (IOException e) {
@@ -52,6 +52,8 @@ public class FileManager {
             e.printStackTrace();
         }
     }
+    // TODO 1. writeAlbum method
+    // TODO 2. readAlbum method 
 
     
 }

@@ -1,13 +1,13 @@
 import java.util.Date;
 
 public class Album{
-    private String title;
-    private String artist;
-    private Date releaseDate;
-    private String genre;
-    private int trackCount;
-    private int totalDuration;   // in minutes
-    private String recordLabel;
+    private String title; // 120 bytes
+    private String artist; // 120 bytes
+    private Date releaseDate;  //  56 bytes
+    private String genre; // 120 bytes
+    private int trackCount; // 4 bytes
+    private int totalDuration;   // in minutes 4 bytes
+    private String recordLabel; // 120 bytes
     // Constructor
     public Album(String title, String artist, Date releaseDate, String genre, int trackCount, int totalDuration, String recordLabel) {
         this.title = title;
