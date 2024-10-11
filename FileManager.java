@@ -7,7 +7,7 @@ import java.util.List;
 
 public class FileManager {
     private static final int STR_MAX_LENGTH = 60;
-    private static final int RECORD_SIZE = 496; // Assumiamo che RECORD_SIZE sia calcolato correttamente in base alla struttura dell'Album
+    private static final int RECORD_SIZE = 416; // Assumiamo che RECORD_SIZE sia calcolato correttamente in base alla struttura dell'Album
     private final File file;
 
     public FileManager(File file) {
@@ -23,7 +23,6 @@ public class FileManager {
     public void writeAlbum(Album album) throws IOException {
         try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
             raf.seek(RECORD_SIZE * numberOfRecords());
-
             writeString(raf, album.getTitle());
             writeString(raf, album.getArtist());
             raf.writeLong(album.getReleaseDate().getTime());  // Scrive la data come timestamp
@@ -50,7 +49,6 @@ public class FileManager {
     public Album readAlbum(long recordNumber) throws IOException {
         try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
             raf.seek(recordNumber * RECORD_SIZE);
-
             String title = readString(raf);
             String artist = readString(raf);
             long releaseDateMillis = raf.readLong();
@@ -59,7 +57,6 @@ public class FileManager {
             int trackCount = raf.readInt();
             int totalDuration = raf.readInt();
             String recordLabel = readString(raf);
-
             return new Album(title, artist, releaseDate, genre, trackCount, totalDuration, recordLabel);
         }
     }
@@ -68,9 +65,6 @@ public class FileManager {
         StringBuilder sb = new StringBuilder(STR_MAX_LENGTH);
         for (int i = 0; i < STR_MAX_LENGTH; i++) {
             char c = raf.readChar();
-            if (c == '\0') {
-                break;
-            }
             sb.append(c);
         }
         return sb.toString();
@@ -84,4 +78,5 @@ public class FileManager {
         }
         return albums;
     }
+    // TODO : manage Exception in methods
 }
