@@ -28,5 +28,10 @@ public class Main {
         for(AlbumIndex albumIndex : albumIndexs){
             System.out.println(albumIndex.toString());
         }
+        // Visualizza un album specificando una posizione
+        System.out.println(fileManager.getAlbum(1).toString());
+
+        // Visualizza un album specificando un titolo come chiave
+        System.out.println(fileManager.getAlbum("Dark Side of the Moon").toString());
     }
 }

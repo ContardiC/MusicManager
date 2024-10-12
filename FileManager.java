@@ -109,6 +109,24 @@ public class FileManager {
     public void orderIndex(){
         Collections.sort(albumIndexs);
     }
+
+    public Album getAlbum(int pos){
+        albums = readAllAlbums();
+        if(pos>=albums.size() || pos<0){
+            return null;
+        }
+        return albums.get(pos);
+    }
+    public Album getAlbum(String key){
+        albums = readAllAlbums();
+        for(int i=0;i<albums.size();i++){
+            if(albums.get(i).getTitle().trim().equals(key.trim())){
+                return albums.get(i);
+            }
+        }
+        return null;
+    }
+
     public Vector<AlbumIndex> showIndex(){
         return albumIndexs;
     }
