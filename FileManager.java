@@ -2,15 +2,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
+import java.util.Vector;
+import java.util.Collections;
 public class FileManager {
     private static final int STR_MAX_LENGTH = 60;
     private static final int RECORD_SIZE = 416; // Assumiamo che RECORD_SIZE sia calcolato correttamente in base alla struttura dell'Album
     private final File file;
-
+    private Vector<Album> albums;
+    private Vector<AlbumIndex> albumIndexs;
     public FileManager(File file) {
         this.file = file;
     }
@@ -22,8 +22,6 @@ public class FileManager {
             raf = new RandomAccessFile(file, "r");
             res =  raf.length() / RECORD_SIZE;
         } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }catch(IOException e){}
         return res;
     }
@@ -61,23 +59,25 @@ public class FileManager {
 
     public Album readAlbum(long recordNumber) {
             Album album = null;
-            RandomAccessFile raf;
+            RandomAccessFile randomAccessFile;
             try {
-                raf = new RandomAccessFile(file, "r");
-                raf.seek(recordNumber * RECORD_SIZE);
-                String title = readString(raf);
-                String artist = readString(raf);
-                long releaseDateMillis = raf.readLong();
+                randomAccessFile = new RandomAccessFile(file, "r");
+                randomAccessFile.seek(recordNumber * RECORD_SIZE);
+                String title = readString(randomAccessFile);
+                String artist = readString(randomAccessFile);
+                long releaseDateMillis = randomAccessFile.readLong();
                 Date releaseDate = new Date(releaseDateMillis);
-                String genre = readString(raf);
-                int trackCount = raf.readInt();
-                int totalDuration = raf.readInt();
-                String recordLabel = readString(raf);
+                String genre = readString(randomAccessFile);
+                int trackCount = randomAccessFile.readInt();
+                int totalDuration = randomAccessFile.readInt();
+                String recordLabel = readString(randomAccessFile);
                 album = new Album(title, artist, releaseDate, genre, trackCount, totalDuration, recordLabel);
+                randomAccessFile.close();
             } catch (FileNotFoundException e) {
             }catch(IOException e){}    
             return album;
     }
+    
 
     private String readString(RandomAccessFile raf) throws IOException {
         StringBuilder sb = new StringBuilder(STR_MAX_LENGTH);
@@ -88,12 +88,28 @@ public class FileManager {
         return sb.toString();
     }
 
-    public List<Album> readAllAlbums()  {
-        List<Album> albums = new ArrayList<>();
+    public Vector<Album> readAllAlbums()  {
+        Vector<Album> albums = new Vector<Album>();
         long numRecords = numberOfRecords();
-        for (long i = 0; i < numRecords; i++) {
+        for (int i = 0; i < numRecords; i++) {
             albums.add(readAlbum(i));
         }
         return albums;
+    }
+
+    public void createIndex(){
+        albums = readAllAlbums();
+        albumIndexs = new Vector<>();
+        AlbumIndex albumIndexTemp;
+        for(int i=0;i<albums.size();i++){
+             albumIndexTemp= new AlbumIndex(albums.get(i).getTitle(), i);
+             albumIndexs.add(albumIndexTemp);
+        }
+    }
+    public void orderIndex(){
+        Collections.sort(albumIndexs);
+    }
+    public Vector<AlbumIndex> showIndex(){
+        return albumIndexs;
     }
 }

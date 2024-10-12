@@ -1,7 +1,3 @@
-import java.io.File;
-import java.io.RandomAccessFile;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 public class AlbumIndex implements Comparable<AlbumIndex>{
     String key; // Album title
     int value; // Album position
@@ -12,6 +8,12 @@ public class AlbumIndex implements Comparable<AlbumIndex>{
     @Override
     public int compareTo(AlbumIndex o) {
         return key.compareTo(o.key);
+    }
+
+    public String toString(){
+        String res = null;
+        res = "{Key: " + key + " value: "+value+"}";
+        return res; 
     }
     
 }
