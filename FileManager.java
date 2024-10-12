@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -14,14 +15,22 @@ public class FileManager {
         this.file = file;
     }
 
-    public long numberOfRecords() throws IOException {
-        try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
-            return raf.length() / RECORD_SIZE;
-        }
+    public long numberOfRecords()  {
+        long res=0;
+        RandomAccessFile raf;
+        try {
+            raf = new RandomAccessFile(file, "r");
+            res =  raf.length() / RECORD_SIZE;
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }catch(IOException e){}
+        return res;
     }
 
     public void writeAlbum(Album album) throws IOException {
-        try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+        try{
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
             raf.seek(RECORD_SIZE * numberOfRecords());
             writeString(raf, album.getTitle());
             writeString(raf, album.getArtist());
@@ -30,35 +39,44 @@ public class FileManager {
             raf.writeInt(album.getTrackCount());
             raf.writeInt(album.getTotalDuration());
             writeString(raf, album.getRecordLabel());
+        }catch(FileNotFoundException e){
+
         }
     }
 
-    private void writeString(RandomAccessFile raf, String str) throws IOException {
+    private void writeString(RandomAccessFile raf, String str) {
         if (str == null) {
-            throw new IllegalArgumentException("String cannot be null");
+            new StringValidationException("String cannot be null");
         }
         if (str.length() > STR_MAX_LENGTH) {
-            throw new IllegalArgumentException("String length exceeds maximum allowed");
+            new StringValidationException("String length exceeds maximum allowed");
         }
-        raf.writeChars(str);
-        for (int i = str.length(); i < STR_MAX_LENGTH; i++) {
-            raf.writeChar('\0');
-        }
+        try {
+            raf.writeChars(str);
+            for (int i = str.length(); i < STR_MAX_LENGTH; i++) {
+                raf.writeChar('\0');
+            }
+        } catch (IOException e) {}
     }
 
-    public Album readAlbum(long recordNumber) throws IOException {
-        try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
-            raf.seek(recordNumber * RECORD_SIZE);
-            String title = readString(raf);
-            String artist = readString(raf);
-            long releaseDateMillis = raf.readLong();
-            Date releaseDate = new Date(releaseDateMillis);
-            String genre = readString(raf);
-            int trackCount = raf.readInt();
-            int totalDuration = raf.readInt();
-            String recordLabel = readString(raf);
-            return new Album(title, artist, releaseDate, genre, trackCount, totalDuration, recordLabel);
-        }
+    public Album readAlbum(long recordNumber) {
+            Album album = null;
+            RandomAccessFile raf;
+            try {
+                raf = new RandomAccessFile(file, "r");
+                raf.seek(recordNumber * RECORD_SIZE);
+                String title = readString(raf);
+                String artist = readString(raf);
+                long releaseDateMillis = raf.readLong();
+                Date releaseDate = new Date(releaseDateMillis);
+                String genre = readString(raf);
+                int trackCount = raf.readInt();
+                int totalDuration = raf.readInt();
+                String recordLabel = readString(raf);
+                album = new Album(title, artist, releaseDate, genre, trackCount, totalDuration, recordLabel);
+            } catch (FileNotFoundException e) {
+            }catch(IOException e){}    
+            return album;
     }
 
     private String readString(RandomAccessFile raf) throws IOException {
@@ -70,7 +88,7 @@ public class FileManager {
         return sb.toString();
     }
 
-    public List<Album> readAllAlbums() throws IOException {
+    public List<Album> readAllAlbums()  {
         List<Album> albums = new ArrayList<>();
         long numRecords = numberOfRecords();
         for (long i = 0; i < numRecords; i++) {
@@ -78,5 +96,4 @@ public class FileManager {
         }
         return albums;
     }
-    // TODO : manage Exception in methods
 }
